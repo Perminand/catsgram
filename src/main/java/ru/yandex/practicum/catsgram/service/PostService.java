@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
-import java.util.Optional;
+import ru.yandex.practicum.catsgram.staticClass.SortOrder;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -22,12 +21,26 @@ public class PostService {
         this.userService = userService;
     }
 
-    public Collection<Post> findAll() {
-        return posts.values();
+    public Collection<Post> findAll(int size, int from, String sort) {
+        if (SortOrder.from(sort) == SortOrder.ASCENDING) {
+            return posts.values()
+                    .stream()
+                    .sorted(Comparator.comparing(Post::getPostDate))
+                    .filter(x -> x.getId() >= size && x.getId() < size + from)
+                    .collect(Collectors.toList());
+        } else {
+            return posts.values()
+                    .stream()
+                    .sorted(Comparator.comparing(Post::getPostDate)
+                            .reversed())
+                    .filter(x -> x.getId() >= size && x.getId() <= size + from)
+                    .collect(Collectors.toList());
+        }
     }
 
-    public Optional<Post> findById(int id) {
-        return Optional.ofNullable(posts.get((long)id));
+    public Optional<Post> findPostById(long id) {
+
+        return Optional.ofNullable(posts.get(id));
     }
         public Post create (Post post) throws ConditionsNotMetException {
             Long idAuthor = post.getAuthorId();
