@@ -1,10 +1,8 @@
 package ru.yandex.practicum.catsgram.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
-import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
@@ -23,8 +21,8 @@ public class UserService {
         return users.values();
     }
 
-    public Optional<User> findById(int id) {
-        return Optional.ofNullable(users.get((long)id));
+    public Optional<User> findUserById(int id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     public User create(User newUser) throws ConditionsNotMetException {
