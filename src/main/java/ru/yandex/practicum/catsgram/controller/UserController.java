@@ -1,18 +1,14 @@
 package ru.yandex.practicum.catsgram.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
-import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.User;
 import ru.yandex.practicum.catsgram.service.UserService;
 
-import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -30,11 +26,16 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User findById(@PathVariable("userId") Integer userId){
-        return userService.findById(userId).orElseThrow(NullPointerException::new);
+    public User findUserById(@PathVariable("userId") long userId) throws ConditionsNotMetException {
+        if (userService.findUserById(userId).isPresent()) {
+            return userService.findUserById(userId).get();
+        } else {
+            throw new ConditionsNotMetException("Нет User с заданным id");
+        }
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User create (@RequestBody User user) throws ConditionsNotMetException {
         return userService.create(user);
     }
