@@ -5,11 +5,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
+import ru.yandex.practicum.catsgram.staticClass.SortOrder;
 
 import java.util.Collection;
 import java.util.Optional;
+
+import static ru.yandex.practicum.catsgram.staticClass.SortOrder.ASCENDING;
+import static ru.yandex.practicum.catsgram.staticClass.SortOrder.DESCENDING;
 
 @RestController
 @RequestMapping("/posts")
@@ -29,6 +34,15 @@ public class PostController {
             @RequestParam Optional<Integer> size,
             @RequestParam Optional<Integer> from,
             @RequestParam Optional<String> sort) {
+        if(!SortOrder.from(sort.get()).equals(ASCENDING)||!SortOrder.from(sort.get()).equals(DESCENDING)){
+            throw new ParameterNotValidException("sort","Получено: " +sort.get()+". Должно быть: \"ascending\" или \"descending\", \"asc\" или \"desc\" ");
+        }
+        if(size.get()<=0){
+            throw new ParameterNotValidException("size", "Размер должен быть больше нуля");
+        }
+        if(from.get()<=0){
+            throw new ParameterNotValidException("from", "Начало выборки должно быть положительным числом");
+        }
         return postService.findAll(size.orElse(SIZE_DEFAULT),from.orElse(FROM_DEFAULT),sort.orElse(SORT_DEFAULT));
     }
 
